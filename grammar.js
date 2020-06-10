@@ -554,7 +554,7 @@ module.exports = grammar({
       $._qualified_operator
     ),
 
-    quoted_name: $ => prec.left(seq(
+    quoted_name: $ => prec.left(1,seq(
       '\'',
       choice(
         $._atype,
@@ -562,14 +562,14 @@ module.exports = grammar({
       )
     )),
 
-    _general_constructor: $ => choice(
+    _general_constructor: $ => prec(3,choice(
       $._qualified_constructor,
       $.unit_constructor,
       $.list_constructor,
       $.function_constructor,
       $.tupling_constructor,
       $.quoted_name,
-    ),
+    )),
 
     _general_type_constructor: $ => prec.left(repeat1(choice(
       $._qualified_type_constructor_identifier,
@@ -1158,7 +1158,7 @@ module.exports = grammar({
       alias($._type_pattern, $.type)
     )),
 
-    _type: $ => repeat1($._atype),
+    _type: $ => prec(0, repeat1($._atype)),
 
     function_type: $ => prec.right(seq(
       alias($._type, $.type),
@@ -1311,13 +1311,13 @@ module.exports = grammar({
       $.equality_constraint
     ),
 
-    _context_lpat: $ => choice(
+    _context_lpat: $ => prec(2,choice(
       $.class,
       repeat1($.type_variable_identifier),
       $._qualified_type_constructor_identifier,
       $.quoted_name,
       $.type_signature
-    ),
+    )),
 
     context: $ => seq(
       choice(
@@ -1343,7 +1343,7 @@ module.exports = grammar({
       $.type_variable_identifier
     )),
 
-    class: $ => choice(
+    class: $ => prec(1,choice(
       seq(
         choice($._qualified_type_class_identifier, $.quoted_name),
         choice(
@@ -1360,7 +1360,7 @@ module.exports = grammar({
         ),
         ')'
       )
-    ),
+    )),
 
     constructors: $ => sep1(
       '|',
@@ -1383,7 +1383,7 @@ module.exports = grammar({
       )
     )),
 
-    strict_type: $ => prec.left(seq(
+    strict_type: $ => prec.left(1,seq(
       '!',
       choice(
         $._atype,
